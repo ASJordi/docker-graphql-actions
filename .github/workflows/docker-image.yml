@@ -18,19 +18,29 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Git Semantic Version
+      uses: PaulHatch/semantic-version@v5.4.0
+      with:
+        major_pattern: "(MAJOR)"
+        minor_pattern: "feat:"
+        version_format: "${major}.${minor}.${patch}-prerelease${increment}"
+      id: version
+
     - name: Login to DockerHub
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        echo "NEW_VERSION: $NEW_VERSION"
 
-    - name: Build the Docker Image
-      run: |
-        docker build --tag asjordi/docker-graphql-actions:0.0.2 .
+    # - name: Build the Docker Image
+    #   run: |
+    #     docker build --tag asjordi/docker-graphql-actions:0.0.2 .
+    #     docker build --tag asjordi/docker-graphql-actions:latest .
 
-    - name: Push the Docker Image
-      run: |
-        docker push asjordi/docker-graphql-actions:0.0.2
-    # - name: Build the Docker image
-    #   run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    # - name: Push the Docker Image
+    #   run: |
+    #     docker push asjordi/docker-graphql-actions:0.0.2
+    #     docker push asjordi/docker-graphql-actions:latest
